@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cursos</title>
+</head>
+<body>
+    <h1> TreinaWeb Cursos </h1>
+    <ul>
+       <% for(var i = 0; i < cursos.length; i++) { %>
+        <li>
+            <%= cursos[i].name %>  R$ <%= cursos[i].price %>  <%= cursos[i].category %> 
+            <button onclick="removeCourse('<%= cursos[i]._id %>')" >X</button>
+        </li>
+        <% } %>
+    </ul>
+    
+    <form onsubmit="createCourse(event)">
+       <input type="text" id="name" placeholder="Name" autofocus/>
+       <input type="text" id="price" placeholder="Price" autofocus/>
+       <input type="text" id="category" placeholder="Category" />
+        <input type="submit" value="Criar">
+    </form>
+</body>
+<script>
+    function createCourse(event){
+        event.preventDefault();
+        var name = document.querySelector('#name').value,
+            price = document.querySelector('#price').value,
+            category = document.querySelector('#category').value;
+        
+        fetch('/', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json', 
+                'Content-Type':'application/json',
+                'Authorization':`JWT ${localStorage['token']}`
+            },
+            body: JSON.stringify({name, price, category})
+        
+        })
+            .then(resp => resp.json())
+            .then(()=>{location.reload()}) 
+            .catch(()=>{
+                console.error('ocorreu um erro');
+        })
+    }
+    function removeCourse(id){
+        fetch(`/remove/${id}`, {
+            method: 'delete',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `JWT ${localStorage['token']}`
+            }
+        })
+            .then(resp => resp.json())
+            .then(()=>{location.reload()})
+            .catch(()=>{
+                console.error('ocorreu um erro!');
+            })
+    }
+    function login(){
+        fetch('/login', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({name: 'bia', password: '123'})
+        })
+            .then(resp => resp.json())
+            .then(resp => {
+                if(resp.token){
+                    localStorage['token'] = resp.token;
+                }
+            })
+
+    }
+    
+</script>
+</html>
